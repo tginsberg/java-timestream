@@ -71,6 +71,8 @@ final Stream<YearMonth> stream = YearMonthStream
         .stream();
 ```
 
+There are also plenty of examples in the unit tests.
+
 ## Contributing and Issues
 
 Please feel free to file issues for change requests or bugs. If you would like to contribute new functionality, please contact me first!
