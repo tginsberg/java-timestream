@@ -1,15 +1,22 @@
 # Java-Timestream
 A set of builders that create streams of java.time objects. 
 
+To use this library in your project, add this to your dependencies:
+
+```xml
+<dependency>
+    <groupId>com.ginsberg</groupId>
+    <artifactId>java-timestream</artifactId>
+    <version>1.0.0</version>
+</dependency
+```
+
 These are fully functional streams, so you can use them like any other stream, once created. 
 
 Once `Stream.takeWhile()` support is added in Java 9, this library will not be very useful. The lack
 of a convenient `takeWhile(Predicate<T> predicate)` method in Java 8 is what lead to the creation
 of this library. 
 
-To get Java-Timestream, clone this repository. I am working to get this in Maven Central ASAP.
-
-    git clone git://github.com/tginsberg/java-timestream.git
    
 This library can create streams of the following java.time classes:
 
