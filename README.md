@@ -8,7 +8,7 @@ To use this library in your project, add this to your dependencies:
     <groupId>com.ginsberg</groupId>
     <artifactId>java-timestream</artifactId>
     <version>1.0.0</version>
-</dependency
+</dependency>
 ```
 
 These are fully functional streams, so you can use them like any other stream, once created. 
