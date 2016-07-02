@@ -104,7 +104,7 @@ while(when.isAfter(end)) {
 ```java
 LocalDateTimeStream
     .fromNow()
-    .until(LocalDateTime.now().minusHours(1))
+    .until(-1, ChronoUnit.HOURS)
     .every(1, ChronoUnit.MINUTES)
     .stream()
     .forEach(this::doSomething);
