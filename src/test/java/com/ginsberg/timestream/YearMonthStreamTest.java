@@ -41,84 +41,98 @@ public class YearMonthStreamTest {
     private final Set<ChronoUnit> validChronoUnits = Sets.newLinkedHashSet(ChronoUnit.MONTHS, ChronoUnit.YEARS,
             ChronoUnit.DECADES, ChronoUnit.CENTURIES, ChronoUnit.ERAS, ChronoUnit.MILLENNIA);
 
+    final YearMonth now = YearMonth.now();
+
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
                 .until(2, ChronoUnit.MONTHS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().plusMonths(1));
+                .containsExactly(now, now.plusMonths(1));
     }
 
     @Test
     public void stopsBeforeUntilDateGivenByYearMonth() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
-                .until(YearMonth.now().plusMonths(2))
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .until(now.plusMonths(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().plusMonths(1));
+                .containsExactly(now, now.plusMonths(1));
     }
 
     @Test
     public void stopsOnToDateGivenByChronoUnits() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
                 .to(2, ChronoUnit.MONTHS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().plusMonths(1), YearMonth.now().plusMonths(2));
+                .containsExactly(now, now.plusMonths(1), now.plusMonths(2));
     }
 
     @Test
     public void stopsOnToDateGivenByYearMonth() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
-                .to(YearMonth.now().plusMonths(2))
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(now.plusMonths(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().plusMonths(1), YearMonth.now().plusMonths(2));
+                .containsExactly(now, now.plusMonths(1), now.plusMonths(2));
     }
 
     @Test
     public void stopsBeforeToWhenEveryIsAfterEndDate() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
                 .to(3, ChronoUnit.MONTHS)
                 .every(2, ChronoUnit.MONTHS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().plusMonths(2));
+                .containsExactly(now, now.plusMonths(2));
     }
 
     @Test
     public void identicalFromAndToCreateOnePointStream() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow()
-                .to(YearMonth.now())
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(now)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now());
+                .containsExactly(now);
     }
 
     @Test
     public void noToDateRunsForever() {
         // No real way to test that a stream never ends so we will just make sure that this generates a lot of iterations.
         final int iterations = 1_000_000;
-        final Stream<YearMonth> stream = YearMonthStream.fromNow().stream().limit(iterations);
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .stream()
+                .limit(iterations);
         assertThat(stream)
                 .isNotNull()
-                .endsWith(YearMonth.now().plus(iterations-1, ChronoUnit.MONTHS))
+                .endsWith(now.plus(iterations-1, ChronoUnit.MONTHS))
                 .hasSize(iterations);
     }
 
     @Test
     public void toBeforeFromRunsBackThroughTime() {
-        final Stream<YearMonth> stream = YearMonthStream.fromNow().to(-2, ChronoUnit.MONTHS).stream();
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(-2, ChronoUnit.MONTHS)
+                .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(YearMonth.now(), YearMonth.now().minusMonths(1), YearMonth.now().minusMonths(2));
+                .containsExactly(now, now.minusMonths(1), now.minusMonths(2));
     }
 
     @Test(expected = NullPointerException.class)
