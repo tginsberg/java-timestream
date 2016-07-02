@@ -31,6 +31,7 @@ And has support for...
 + Exclusive end point (`until`)
 + Configurable period between stream elements (`every`)
 + Streams can move forward or backward through time
++ Infinite streams (by not providing an end point)
 
 ## Usage
 
@@ -40,10 +41,18 @@ builder can be created using one of two methods:
 + `.fromNow()` - Assumes 'now'
 + `.from(T from)` - Type-specific starting point, provided by caller
 
-To set the point in time where the stream ends (optional!), you can call one of two methods:
+To set the optional point in time where the stream ends (inclusive) you can call one of two methods:
 
 + `.to(T to)` - Type-specific end point. Can be null to indicate forever
 + `.to(amount, units)` - Where `amount` is a positive integer (for forward through time) or a negative integer (for backward through time), and `unit` is a valid `ChronoUnit`
+
+To make the optional end of the stream exclusive, you can call one of two methods:
+
++ `.until(T to)` - Type-specific end point. Can be null to indicate forever
++ `.until(amount, units)` - Where `amount` is a positive integer (for forward through time) or a negative integer (for backward through time), and `unit` is a valid `ChronoUnit`
+
+Note that providing an end time (via `to` or `until`) is optional. In that case, the stream will
+have no end and should produce values until you stop it.
 
 ## Examples
 
@@ -77,6 +86,31 @@ final Stream<YearMonth> stream = YearMonthStream
         .every(1, ChronoUnit.MONTHS) // This is the default
         .stream();
 ```
+
+Replace this code that does something with every minute of time over the last hour, going backwards:
+
+```java
+final LocalDateTime end = LocalDateTime.now().minusHours(1);
+LocalDateTime when = LocalDateTime.now();
+
+while(when.isAfter(end)) {
+    doSomething(when);
+    when = when.minusMinutes(1);
+}
+```
+
+... with this:
+
+```java
+LocalDateTimeStream
+    .fromNow()
+    .until(LocalDateTime.now().minusHours(1))
+    .every(1, ChronoUnit.MINUTES)
+    .stream()
+    .forEach(this::doSomething);
+```
+
+It's not less code, but it certainly makes it easier to understand.
 
 There are also plenty of examples in the unit tests.
 
