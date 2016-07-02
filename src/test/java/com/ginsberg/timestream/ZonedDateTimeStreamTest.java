@@ -34,10 +34,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ZonedDateTimeStreamTest {
 
+    final ZonedDateTime now = ZonedDateTime.now();
+
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now)
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
                 .until(2, ChronoUnit.SECONDS)
                 .stream();
         assertThat(stream)
@@ -47,9 +49,9 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void stopsBeforeUntilDateGivenByZonedDateTime() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now)
-                .until(ZonedDateTime.now().plusSeconds(2))
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .until(now.plusSeconds(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
@@ -58,8 +60,8 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void stopsOnToDateGivenByChronoUnits() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now)
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
                 .to(2, ChronoUnit.SECONDS)
                 .stream();
         assertThat(stream)
@@ -69,9 +71,9 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void stopsOnToDateGivenByZonedDateTime() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now)
-                .to(ZonedDateTime.now().plusSeconds(2))
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(now.plusSeconds(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
@@ -80,8 +82,8 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void stopsBeforeToWhenEveryIsAfterEndDate() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now)
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
                 .to(3, ChronoUnit.SECONDS)
                 .every(2, ChronoUnit.SECONDS)
                 .stream();
@@ -92,20 +94,23 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void identicalFromAndToCreateOnePointStream() {
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.fromNow()
-                .to(ZonedDateTime.now())
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(now)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(ZonedDateTime.now());
+                .containsExactly(now);
     }
 
     @Test
     public void noToDateRunsForever() {
         // No real way to test that a stream never ends so we will just make sure that this generates a lot of iterations.
         final int iterations = 1_000_000;
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now).stream().limit(iterations);
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .stream()
+                .limit(iterations);
         assertThat(stream)
                 .isNotNull()
                 .endsWith(now.plus(iterations-1, ChronoUnit.SECONDS))
@@ -114,8 +119,10 @@ public class ZonedDateTimeStreamTest {
 
     @Test
     public void toBeforeFromRunsBackThroughTime() {
-        final ZonedDateTime now = ZonedDateTime.now();
-        final Stream<ZonedDateTime> stream = ZonedDateTimeStream.from(now).to(-2, ChronoUnit.SECONDS).stream();
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(-2, ChronoUnit.SECONDS)
+                .stream();
         assertThat(stream)
                 .isNotNull()
                 .containsExactly(now, now.minusSeconds(1), now.minusSeconds(2));

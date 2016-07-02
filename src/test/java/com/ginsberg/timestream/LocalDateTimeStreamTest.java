@@ -34,10 +34,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LocalDateTimeStreamTest {
 
+    final LocalDateTime now = LocalDateTime.now();
+
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now)
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
                 .until(2, ChronoUnit.SECONDS)
                 .stream();
         assertThat(stream)
@@ -47,9 +49,9 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void stopsBeforeUntilDateGivenByLocalDateTime() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now)
-                .until(LocalDateTime.now().plusSeconds(2))
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .until(now.plusSeconds(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
@@ -58,8 +60,8 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void stopsOnToDateGivenByChronoUnits() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now)
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
                 .to(2, ChronoUnit.SECONDS)
                 .stream();
         assertThat(stream)
@@ -69,9 +71,9 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void stopsOnToDateGivenByLocalDateTime() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now)
-                .to(LocalDateTime.now().plusSeconds(2))
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(now.plusSeconds(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
@@ -80,8 +82,8 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void stopsBeforeToWhenEveryIsAfterEndDate() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now)
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
                 .to(3, ChronoUnit.SECONDS)
                 .every(2, ChronoUnit.SECONDS)
                 .stream();
@@ -92,20 +94,23 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void identicalFromAndToCreateOnePointStream() {
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.fromNow()
-                .to(LocalDateTime.now())
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(now)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDateTime.now());
+                .containsExactly(now);
     }
 
     @Test
     public void noToDateRunsForever() {
         // No real way to test that a stream never ends so we will just make sure that this generates a lot of iterations.
         final int iterations = 1_000_000;
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now).stream().limit(iterations);
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .stream()
+                .limit(iterations);
         assertThat(stream)
                 .isNotNull()
                 .endsWith(now.plus(iterations-1, ChronoUnit.SECONDS))
@@ -114,8 +119,10 @@ public class LocalDateTimeStreamTest {
 
     @Test
     public void toBeforeFromRunsBackThroughTime() {
-        final LocalDateTime now = LocalDateTime.now();
-        final Stream<LocalDateTime> stream = LocalDateTimeStream.from(now).to(-2, ChronoUnit.SECONDS).stream();
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(-2, ChronoUnit.SECONDS)
+                .stream();
         assertThat(stream)
                 .isNotNull()
                 .containsExactly(now, now.minusSeconds(1), now.minusSeconds(2));

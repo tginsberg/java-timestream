@@ -42,84 +42,98 @@ public class LocalDateStreamTest {
             ChronoUnit.MONTHS, ChronoUnit.YEARS, ChronoUnit.DECADES, ChronoUnit.CENTURIES,
             ChronoUnit.ERAS, ChronoUnit.MILLENNIA);
 
+    final LocalDate now = LocalDate.now();
+
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
                 .until(2, ChronoUnit.DAYS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().plusDays(1));
+                .containsExactly(now, now.plusDays(1));
     }
 
     @Test
     public void stopsBeforeUntilDateGivenByLocalDate() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
-                .until(LocalDate.now().plusDays(2))
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .until(now.plusDays(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().plusDays(1));
+                .containsExactly(now, now.plusDays(1));
     }
 
     @Test
     public void stopsOnToDateGivenByChronoUnits() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
                 .to(2, ChronoUnit.DAYS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+                .containsExactly(now, now.plusDays(1), now.plusDays(2));
     }
 
     @Test
     public void stopsOnToDateGivenByLocalDate() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
-                .to(LocalDate.now().plusDays(2))
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(now.plusDays(2))
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+                .containsExactly(now, now.plusDays(1), now.plusDays(2));
     }
 
     @Test
     public void stopsBeforeToWhenEveryIsAfterEndDate() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
                 .to(3, ChronoUnit.DAYS)
                 .every(2, ChronoUnit.DAYS)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().plusDays(2));
+                .containsExactly(now, now.plusDays(2));
     }
 
     @Test
     public void identicalFromAndToCreateOnePointStream() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow()
-                .to(LocalDate.now())
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(now)
                 .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now());
+                .containsExactly(now);
     }
 
     @Test
     public void noToDateRunsForever() {
         // No real way to test that a stream never ends so we will just make sure that this generates a lot of iterations.
         final int iterations = 1_000_000;
-        final Stream<LocalDate> stream = LocalDateStream.fromNow().stream().limit(iterations);
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .stream()
+                .limit(iterations);
         assertThat(stream)
                 .isNotNull()
-                .endsWith(LocalDate.now().plus(iterations-1, ChronoUnit.DAYS))
+                .endsWith(now.plus(iterations-1, ChronoUnit.DAYS))
                 .hasSize(iterations);
     }
 
     @Test
     public void toBeforeFromRunsBackThroughTime() {
-        final Stream<LocalDate> stream = LocalDateStream.fromNow().to(-2, ChronoUnit.DAYS).stream();
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(-2, ChronoUnit.DAYS)
+                .stream();
         assertThat(stream)
                 .isNotNull()
-                .containsExactly(LocalDate.now(), LocalDate.now().minusDays(1), LocalDate.now().minusDays(2));
+                .containsExactly(now, now.minusDays(1), now.minusDays(2));
     }
 
     @Test(expected = NullPointerException.class)
