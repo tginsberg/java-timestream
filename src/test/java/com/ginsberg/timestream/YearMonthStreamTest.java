@@ -100,6 +100,55 @@ public class YearMonthStreamTest {
     }
 
     @Test
+    public void negativeEveryUnitStillGoesForward() {
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(3, ChronoUnit.MONTHS)
+                .every(-2, ChronoUnit.MONTHS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusMonths(2));
+    }
+
+
+    @Test
+    public void negativeEveryPeriodStillGoesForward() {
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(3, ChronoUnit.MONTHS)
+                .every(Period.parse("-P2M"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusMonths(2));
+    }
+
+    @Test
+    public void positiveEveryUnitStillGoesBackward() {
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(-3, ChronoUnit.MONTHS)
+                .every(2, ChronoUnit.MONTHS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusMonths(2));
+    }
+
+    @Test
+    public void positiveEveryPeriodStillGoesBackward() {
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(-3, ChronoUnit.MONTHS)
+                .every(Period.parse("P2M"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusMonths(2));
+    }
+
+    @Test
     public void identicalFromAndToCreateOnePointStream() {
         final Stream<YearMonth> stream = YearMonthStream
                 .from(now)
@@ -163,14 +212,29 @@ public class YearMonthStreamTest {
         YearMonthStream.fromNow().until(1, null);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void everyMustHavePeriod() {
+        YearMonthStream.fromNow().every(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmount() {
+        YearMonthStream.fromNow().every(0, ChronoUnit.MONTHS);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmountFromPeriod() {
+        YearMonthStream.fromNow().every(Period.parse("P1W"));
+    }
+
     @Test
     public void everyWithInvalidChronoUnitFailsFast() {
-        expectingChronoUnitException(u -> YearMonthStream.fromNow().every(0, u), validChronoUnits);
+        expectingChronoUnitException(u -> YearMonthStream.fromNow().every(1, u), validChronoUnits);
     }
 
     @Test
     public void everyWithValidChronoUnit() {
-        notExpectingChronoUnitException(u -> YearMonthStream.fromNow().every(0, u), validChronoUnits);
+        notExpectingChronoUnitException(u -> YearMonthStream.fromNow().every(1, u), validChronoUnits);
     }
 
     @Test

@@ -142,6 +142,54 @@ public class LocalDateTimeStreamTest {
                 .containsExactly(now, now.plusSeconds(2));
     }
 
+    @Test
+    public void positiveEveryUnitStillGoesBackward() {
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(-3, ChronoUnit.SECONDS)
+                .every(2, ChronoUnit.SECONDS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusSeconds(2));
+    }
+
+    @Test
+    public void positiveEveryDurationStillGoesBackward() {
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(-3, ChronoUnit.SECONDS)
+                .every(Duration.parse("PT2S"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusSeconds(2));
+    }
+
+    @Test
+    public void negativeEveryUnitStillGoesForward() {
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(3, ChronoUnit.SECONDS)
+                .every(-2, ChronoUnit.SECONDS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusSeconds(2));
+    }
+
+    @Test
+    public void negativeEveryDurationStillGoesForward() {
+        final Stream<LocalDateTime> stream = LocalDateTimeStream
+                .from(now)
+                .to(3, ChronoUnit.SECONDS)
+                .every(Duration.parse("-PT2S"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusSeconds(2));
+    }
+
     @Test(expected = NullPointerException.class)
     public void mustHaveFromDate() {
         LocalDateTimeStream.from(null);
@@ -155,5 +203,20 @@ public class LocalDateTimeStreamTest {
     @Test(expected = NullPointerException.class)
     public void untilByUnitsMustHaveUnit() {
         LocalDateTimeStream.fromNow().until(1, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void everyMustHaveDuration() {
+        LocalDateTimeStream.fromNow().every(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmount() {
+        LocalDateTimeStream.fromNow().every(0, ChronoUnit.SECONDS);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmountFromPeriod() {
+        LocalDateTimeStream.fromNow().every(Duration.parse("PT0S"));
     }
 }

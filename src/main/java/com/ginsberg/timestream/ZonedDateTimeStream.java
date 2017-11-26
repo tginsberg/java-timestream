@@ -143,6 +143,9 @@ public class ZonedDateTimeStream extends AbstractComparableStream<ZonedDateTime>
         Objects.requireNonNull(unit);
         this.amount = Math.abs(amount);
         this.unit = unit;
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Amount must be non-zero");
+        }
         return this;
     }
 
@@ -150,15 +153,17 @@ public class ZonedDateTimeStream extends AbstractComparableStream<ZonedDateTime>
      * Set the duration between successive elements produced by the stream. The default
      * for this builder is 1 Second.
      *
-
      * @return A non-null ZonedDateTimeStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
      */
-    public ZonedDateTimeStream every(Duration duration) {
+    public ZonedDateTimeStream every(final Duration duration) {
         Objects.requireNonNull(unit);
         this.unit = ChronoUnit.SECONDS;
-        this.amount = duration.get(this.unit);
+        this.amount = Math.abs(duration.get(this.unit));
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Effective amount must be non-zero (Duration resolves to zero duration)");
+        }
         return this;
     }
 

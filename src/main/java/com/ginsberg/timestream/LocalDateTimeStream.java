@@ -143,6 +143,9 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
         Objects.requireNonNull(unit);
         this.amount = Math.abs(amount);
         this.unit = unit;
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Amount must be non-zero");
+        }
         return this;
     }
 
@@ -155,10 +158,13 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
      */
-    public LocalDateTimeStream every(Duration duration) {
+    public LocalDateTimeStream every(final Duration duration) {
         Objects.requireNonNull(unit);
         this.unit = ChronoUnit.SECONDS;
-        this.amount = duration.get(this.unit);
+        this.amount = Math.abs(duration.get(this.unit));
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Effective amount must be non-zero (Duration resolves to zero duration)");
+        }
         return this;
     }
 

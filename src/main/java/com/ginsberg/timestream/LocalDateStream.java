@@ -144,6 +144,9 @@ public class LocalDateStream extends AbstractComparableStream<LocalDate> {
         this.amount = Math.abs(amount);
         this.unit = unit;
         LocalDate.now().plus(0, unit); // Fail fast test
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Amount must be non-zero");
+        }
         return this;
     }
 
@@ -156,11 +159,14 @@ public class LocalDateStream extends AbstractComparableStream<LocalDate> {
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the period is not supported.
      * @see ChronoUnit
      */
-    public LocalDateStream every(Period period) {
+    public LocalDateStream every(final Period period) {
         Objects.requireNonNull(period);
         this.unit = ChronoUnit.DAYS;
-        this.amount = period.get(this.unit);
+        this.amount = Math.abs(period.get(this.unit));
         LocalDate.now().plus(0, unit); // Fail fast test
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Effective amount must be non-zero (Period resolves to zero duration)");
+        }
         return this;
     }
 

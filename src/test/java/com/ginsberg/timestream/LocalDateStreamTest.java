@@ -101,6 +101,54 @@ public class LocalDateStreamTest {
     }
 
     @Test
+    public void negativeEveryUnitStillGoesForward() {
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(3, ChronoUnit.DAYS)
+                .every(-2, ChronoUnit.DAYS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusDays(2));
+    }
+
+    @Test
+    public void negativeEveryPeriodStillGoesForward() {
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(3, ChronoUnit.DAYS)
+                .every(Period.parse("-P2D"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusDays(2));
+    }
+
+    @Test
+    public void positiveEveryUnitStillGoesBackward() {
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(-3, ChronoUnit.DAYS)
+                .every(2, ChronoUnit.DAYS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusDays(2));
+    }
+
+    @Test
+    public void positiveEveryPeriodStillGoesBackward() {
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .to(-3, ChronoUnit.DAYS)
+                .every(Period.parse("P2D"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusDays(2));
+    }
+
+    @Test
     public void identicalFromAndToCreateOnePointStream() {
         final Stream<LocalDate> stream = LocalDateStream
                 .from(now)
@@ -164,14 +212,29 @@ public class LocalDateStreamTest {
         LocalDateStream.fromNow().until(1, null);
     }
 
+    @Test(expected = NullPointerException.class)
+    public void everyMustHavePeriod() {
+        LocalDateStream.fromNow().every(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmount() {
+        LocalDateStream.fromNow().every(0, ChronoUnit.DAYS);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmountFromPeriod() {
+        LocalDateStream.fromNow().every(Period.parse("P0D"));
+    }
+
     @Test
     public void everyWithInvalidChronoUnitFailsFast() {
-        expectingChronoUnitException(u -> LocalDateStream.fromNow().every(0, u), validChronoUnits);
+        expectingChronoUnitException(u -> LocalDateStream.fromNow().every(1, u), validChronoUnits);
     }
 
     @Test
     public void everyWithValidChronoUnit() {
-        notExpectingChronoUnitException(u -> LocalDateStream.fromNow().every(0, u), validChronoUnits);
+        notExpectingChronoUnitException(u -> LocalDateStream.fromNow().every(1, u), validChronoUnits);
     }
 
     @Test

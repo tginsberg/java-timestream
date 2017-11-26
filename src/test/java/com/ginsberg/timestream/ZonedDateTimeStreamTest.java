@@ -142,6 +142,54 @@ public class ZonedDateTimeStreamTest {
                 .containsExactly(now, now.plusSeconds(2));
     }
 
+    @Test
+    public void positiveEveryUnitStillGoesBackward() {
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(-3, ChronoUnit.SECONDS)
+                .every(2, ChronoUnit.SECONDS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusSeconds(2));
+    }
+
+    @Test
+    public void positiveEveryDurationStillGoesBackward() {
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(-3, ChronoUnit.SECONDS)
+                .every(Duration.parse("PT2S"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.minusSeconds(2));
+    }
+
+    @Test
+    public void negativeEveryUnitStillGoesForward() {
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(3, ChronoUnit.SECONDS)
+                .every(-2, ChronoUnit.SECONDS)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusSeconds(2));
+    }
+
+    @Test
+    public void negativeEveryDurationStillGoesForward() {
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(3, ChronoUnit.SECONDS)
+                .every(Duration.parse("-PT2S"))
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusSeconds(2));
+    }
+
     @Test(expected = NullPointerException.class)
     public void mustHaveFromDate() {
         ZonedDateTimeStream.from(null);
@@ -155,5 +203,20 @@ public class ZonedDateTimeStreamTest {
     @Test(expected = NullPointerException.class)
     public void untilByUnitsMustHaveUnit() {
         ZonedDateTimeStream.fromNow().until(1, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void everyMustHavePeriod() {
+        ZonedDateTimeStream.fromNow().every(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmount() {
+        ZonedDateTimeStream.fromNow().every(0, ChronoUnit.SECONDS);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void everyMustHaveNonZeroAmountFromPeriod() {
+        ZonedDateTimeStream.fromNow().every(Duration.parse("PT0S"));
     }
 }

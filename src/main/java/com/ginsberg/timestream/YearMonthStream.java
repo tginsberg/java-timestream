@@ -144,6 +144,9 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
         this.amount = Math.abs(amount);
         this.unit = unit;
         YearMonth.now().plus(0, unit); // Fail fast test
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Amount must be non-zero");
+        }
         return this;
     }
 
@@ -155,11 +158,14 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
      */
-    public YearMonthStream every(Period period) {
+    public YearMonthStream every(final Period period) {
         Objects.requireNonNull(unit);
         this.unit = ChronoUnit.MONTHS;
-        this.amount = period.get(this.unit);
+        this.amount = Math.abs(period.get(this.unit));
         YearMonth.now().plus(0, unit); // Fail fast test
+        if (this.amount == 0) {
+            throw new IllegalArgumentException("Effective amount must be non-zero (Period resolves to zero duration)");
+        }
         return this;
     }
 
