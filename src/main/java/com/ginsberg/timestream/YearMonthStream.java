@@ -24,6 +24,7 @@
 
 package com.ginsberg.timestream;
 
+import java.time.Period;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -31,7 +32,7 @@ import java.util.function.UnaryOperator;
 
 /**
  * A builder that creates a stream of YearMonth objects.
- *
+ * <p>
  * <pre>
  * {@code
  * // Print all of the YearMonths between now and a year from now, every other month.
@@ -47,8 +48,12 @@ import java.util.function.UnaryOperator;
  * @author Todd Ginsberg (todd@ginsberg.com)
  */
 public class YearMonthStream extends AbstractComparableStream<YearMonth> {
-    private int amount = 1;
+    private long amount = 1;
     private ChronoUnit unit = ChronoUnit.MONTHS;
+
+    private YearMonthStream(final YearMonth from) {
+        super(from);
+    }
 
     /**
      * Create a YearMonthStream, starting at YearMonth.now().
@@ -69,10 +74,6 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
         return new YearMonthStream(from);
     }
 
-    private YearMonthStream(final YearMonth from) {
-        super(from);
-    }
-
     /**
      * Set the inclusive end point of the stream, using an absolute YearMonth.
      *
@@ -88,7 +89,7 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
      * Set the inclusive end point of the stream, using a relative duration.
      *
      * @param amount The number of units to use when calculating the duration of the stream. May be negative.
-     * @param unit The non-null unit the amount is denominated in. May not be null.
+     * @param unit   The non-null unit the amount is denominated in. May not be null.
      * @return A non-null YearMonthStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -115,7 +116,7 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
      * Set the exclusive end point of the stream, using a relative duration.
      *
      * @param amount The number of units to use when calculating the duration of the stream. May be negative.
-     * @param unit The non-null unit the amount is denominated in.
+     * @param unit   The non-null unit the amount is denominated in.
      * @return A non-null YearMonthStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -132,7 +133,7 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
      * for this builder is 1 Month.
      *
      * @param amount The number of units to use when calculating the next element of the stream.
-     * @param unit The non-null unit the amount is denominated in.
+     * @param unit   The non-null unit the amount is denominated in.
      * @return A non-null YearMonthStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -142,6 +143,22 @@ public class YearMonthStream extends AbstractComparableStream<YearMonth> {
         Objects.requireNonNull(unit);
         this.amount = Math.abs(amount);
         this.unit = unit;
+        YearMonth.now().plus(0, unit); // Fail fast test
+        return this;
+    }
+
+    /**
+     * Set the duration between successive elements produced by the stream. The default
+     * for this builder is 1 Month.
+     *
+     * @return A non-null YearMonthStream.
+     * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
+     * @see ChronoUnit
+     */
+    public YearMonthStream every(Period period) {
+        Objects.requireNonNull(unit);
+        this.unit = ChronoUnit.MONTHS;
+        this.amount = period.get(this.unit);
         YearMonth.now().plus(0, unit); // Fail fast test
         return this;
     }

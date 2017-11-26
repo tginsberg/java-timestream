@@ -28,6 +28,7 @@ import org.assertj.core.util.Sets;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -38,11 +39,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LocalDateStreamTest {
 
+    final LocalDate now = LocalDate.now();
     private final Set<ChronoUnit> validChronoUnits = Sets.newLinkedHashSet(ChronoUnit.DAYS, ChronoUnit.WEEKS,
             ChronoUnit.MONTHS, ChronoUnit.YEARS, ChronoUnit.DECADES, ChronoUnit.CENTURIES,
             ChronoUnit.ERAS, ChronoUnit.MILLENNIA);
-
-    final LocalDate now = LocalDate.now();
 
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
@@ -121,7 +121,7 @@ public class LocalDateStreamTest {
                 .limit(iterations);
         assertThat(stream)
                 .isNotNull()
-                .endsWith(now.plus(iterations-1, ChronoUnit.DAYS))
+                .endsWith(now.plus(iterations - 1, ChronoUnit.DAYS))
                 .hasSize(iterations);
     }
 
@@ -134,6 +134,19 @@ public class LocalDateStreamTest {
         assertThat(stream)
                 .isNotNull()
                 .containsExactly(now, now.minusDays(1), now.minusDays(2));
+    }
+
+    @Test
+    public void stopsBeforeToWhenEveryPeriodIsAfterEndDate() {
+        final Period period = Period.parse("P15D");
+        final Stream<LocalDate> stream = LocalDateStream
+                .from(now)
+                .until(now.plusMonths(1))
+                .every(period)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusDays(15));
     }
 
     @Test(expected = NullPointerException.class)

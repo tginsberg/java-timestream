@@ -24,6 +24,7 @@
 
 package com.ginsberg.timestream;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -31,7 +32,7 @@ import java.util.function.UnaryOperator;
 
 /**
  * A builder that creates a stream of LocalDateTime objects.
- *
+ * <p>
  * <pre>
  * {@code
  * // Print all of the LocalDateTimes between now and a day from now, every other minute.
@@ -47,8 +48,12 @@ import java.util.function.UnaryOperator;
  * @author Todd Ginsberg (todd@ginsberg.com)
  */
 public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime> {
-    private int amount = 1;
+    private long amount = 1;
     private ChronoUnit unit = ChronoUnit.SECONDS;
+
+    private LocalDateTimeStream(final LocalDateTime from) {
+        super(from);
+    }
 
     /**
      * Create a LocalDateTimeStream, starting at LocalDateTime.now().
@@ -69,10 +74,6 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
         return new LocalDateTimeStream(from);
     }
 
-    private LocalDateTimeStream(final LocalDateTime from) {
-        super(from);
-    }
-
     /**
      * Set the inclusive end point of the stream, using an absolute LocalDateTime.
      *
@@ -88,7 +89,7 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
      * Set the inclusive end point of the stream, using a relative duration.
      *
      * @param amount The number of units to use when calculating the duration of the stream. May be negative.
-     * @param unit The non-null unit the amount is denominated in. May not be null.
+     * @param unit   The non-null unit the amount is denominated in. May not be null.
      * @return A non-null LocalDateTimeStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -115,7 +116,7 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
      * Set the exclusive end point of the stream, using a relative duration.
      *
      * @param amount The number of units to use when calculating the duration of the stream. May be negative.
-     * @param unit The non-null unit the amount is denominated in.
+     * @param unit   The non-null unit the amount is denominated in.
      * @return A non-null LocalDateTimeStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -132,7 +133,7 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
      * for this builder is 1 Second.
      *
      * @param amount The number of units to use when calculating the next element of the stream.
-     * @param unit The non-null unit the amount is denominated in.
+     * @param unit   The non-null unit the amount is denominated in.
      * @return A non-null LocalDateTimeStream.
      * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
      * @see ChronoUnit
@@ -142,6 +143,22 @@ public class LocalDateTimeStream extends AbstractComparableStream<LocalDateTime>
         Objects.requireNonNull(unit);
         this.amount = Math.abs(amount);
         this.unit = unit;
+        return this;
+    }
+
+    /**
+     * Set the duration between successive elements produced by the stream. The default
+     * for this builder is 1 Second.
+     *
+     * @param duration The interval to use when calculating the next element of the stream.
+     * @return A non-null LocalDateTimeStream.
+     * @throws java.time.temporal.UnsupportedTemporalTypeException if the unit is not supported.
+     * @see ChronoUnit
+     */
+    public LocalDateTimeStream every(Duration duration) {
+        Objects.requireNonNull(unit);
+        this.unit = ChronoUnit.SECONDS;
+        this.amount = duration.get(this.unit);
         return this;
     }
 

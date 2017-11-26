@@ -27,6 +27,7 @@ package com.ginsberg.timestream;
 import org.assertj.core.util.Sets;
 import org.junit.Test;
 
+import java.time.Period;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
@@ -38,10 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class YearMonthStreamTest {
 
+    final YearMonth now = YearMonth.now();
     private final Set<ChronoUnit> validChronoUnits = Sets.newLinkedHashSet(ChronoUnit.MONTHS, ChronoUnit.YEARS,
             ChronoUnit.DECADES, ChronoUnit.CENTURIES, ChronoUnit.ERAS, ChronoUnit.MILLENNIA);
-
-    final YearMonth now = YearMonth.now();
 
     @Test
     public void stopsBeforeUntilDateGivenByChronoUnits() {
@@ -120,7 +120,7 @@ public class YearMonthStreamTest {
                 .limit(iterations);
         assertThat(stream)
                 .isNotNull()
-                .endsWith(now.plus(iterations-1, ChronoUnit.MONTHS))
+                .endsWith(now.plus(iterations - 1, ChronoUnit.MONTHS))
                 .hasSize(iterations);
     }
 
@@ -133,6 +133,19 @@ public class YearMonthStreamTest {
         assertThat(stream)
                 .isNotNull()
                 .containsExactly(now, now.minusMonths(1), now.minusMonths(2));
+    }
+
+    @Test
+    public void stopsBeforeToWhenEveryDurationIsAfterEndDate() {
+        final Period period = Period.parse("P2M");
+        final Stream<YearMonth> stream = YearMonthStream
+                .from(now)
+                .to(3, ChronoUnit.MONTHS)
+                .every(period)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusMonths(2));
     }
 
     @Test(expected = NullPointerException.class)

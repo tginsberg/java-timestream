@@ -26,6 +26,7 @@ package com.ginsberg.timestream;
 
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
@@ -113,7 +114,7 @@ public class ZonedDateTimeStreamTest {
                 .limit(iterations);
         assertThat(stream)
                 .isNotNull()
-                .endsWith(now.plus(iterations-1, ChronoUnit.SECONDS))
+                .endsWith(now.plus(iterations - 1, ChronoUnit.SECONDS))
                 .hasSize(iterations);
     }
 
@@ -126,6 +127,19 @@ public class ZonedDateTimeStreamTest {
         assertThat(stream)
                 .isNotNull()
                 .containsExactly(now, now.minusSeconds(1), now.minusSeconds(2));
+    }
+
+    @Test
+    public void stopsBeforeToWhenEveryDurationIsAfterEndDate() {
+        final Duration duration = Duration.parse("PT2S");
+        final Stream<ZonedDateTime> stream = ZonedDateTimeStream
+                .from(now)
+                .to(3, ChronoUnit.SECONDS)
+                .every(duration)
+                .stream();
+        assertThat(stream)
+                .isNotNull()
+                .containsExactly(now, now.plusSeconds(2));
     }
 
     @Test(expected = NullPointerException.class)

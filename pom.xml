@@ -31,7 +31,7 @@
     <artifactId>java-timestream</artifactId>
     <description>A set of builders that create streams of java.time objects</description>
     <url>https://github.com/tginsberg/java-timestream</url>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <issueManagement>
