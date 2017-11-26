@@ -13,10 +13,8 @@ To use this library in your project, add this to your dependencies:
 
 These are fully functional streams, so you can use them like any other stream, once created. 
 
-Once `Stream.takeWhile()` support is added in Java 9, this library will not be very useful. The lack
-of a convenient `takeWhile(Predicate<T> predicate)` method in Java 8 is what lead to the creation
-of this library. 
-
+The lack of a convenient `takeWhile(Predicate<T> predicate)` method in Java 8 is what led to the creation
+of this library. Now that Java 9 has `Stream.takeWhile()` support, there is no reason to add this as a dependency.
    
 This library can create streams of the following java.time classes:
 
@@ -50,6 +48,13 @@ To make the optional end of the stream exclusive, you can call one of two method
 
 + `.until(T to)` - Type-specific end point. Can be null to indicate forever
 + `.until(amount, units)` - Where `amount` is a positive integer (for forward through time) or a negative integer (for backward through time), and `unit` is a valid `ChronoUnit`
+
+To indicate how much time should be skipped in each iteration:
+
++ `.every(amount, units)` - Where `amount` is an integer representing the number of units, and `unit` is a valid `ChronoUnit`
++ `.every(period)` - Where `period` is a valid `Period` object. (Supported on `LocalDateStream` and `YearMonthStream` only).
++ `.every(duration)` - Where `duration` is a valid `Duration` object. (Supported on everything other than `LocalDateStream` and `YearMonthStream`).
+
 
 Note that providing an end time (via `to` or `until`) is optional. In that case, the stream will
 have no end and should produce values until you stop it.
