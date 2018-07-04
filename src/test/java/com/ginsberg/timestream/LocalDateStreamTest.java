@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LocalDateStreamTest {
 
-    final LocalDate now = LocalDate.now();
+    private final LocalDate now = LocalDate.now();
     private final Set<ChronoUnit> validChronoUnits = Sets.newLinkedHashSet(ChronoUnit.DAYS, ChronoUnit.WEEKS,
             ChronoUnit.MONTHS, ChronoUnit.YEARS, ChronoUnit.DECADES, ChronoUnit.CENTURIES,
             ChronoUnit.ERAS, ChronoUnit.MILLENNIA);
@@ -189,7 +189,7 @@ public class LocalDateStreamTest {
         final Period period = Period.parse("P15D");
         final Stream<LocalDate> stream = LocalDateStream
                 .from(now)
-                .until(now.plusMonths(1))
+                .until(now.plusDays(30))
                 .every(period)
                 .stream();
         assertThat(stream)
